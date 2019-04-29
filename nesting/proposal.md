@@ -13,38 +13,112 @@ design issues:
 
 ## Lifetime
 
-```xml
-<!-- Toy Robot -->
-<model name="robot">
-    ...
-    <link name="final_link">...</link>
-    <frame name="end_effector">
-        <pose frame="final_link">...</pose>
-    </frame>
-</model>
+For this aspect, the goal of this proposal is meant to permit the following:
 
-<!-- Electric Flange -->
-<!-- NOTE: PURELY kinematic. Only defines frames. -->
-<model name="electric_flange">
-    <frame name="
-</model>
-
-<!-- Toy Gripper -->
-<model name="gripper">
-    ...
-</model>
-```
-
-Proposed welding semantics:
-```xml
-<!-- Electric Gripper Frame -->
-<model name="robot_with_gripper">
-    <include></include>
-</model>
-```
-
-
+* Adding models *after other models have been processed*
+    * This is achievable with current implementation of Gazebo, and with
+    partially-conformant implementation of Drake. However, with new proposals
+    for `//pose[@frame]` semantics, and the deisre to stick with model-aboslute
+    coordinates, this may become more nuanced when referring to frames in a
+    model.
+    * This permits SDFormat to be a *non-viral* format, e.g. a library developer
+    does not have to try and implement a mechanism to convert to some holisitc
+    SDFormat IR, or their own incantation thereof.
 
 ## Encapsulation
 
+In order to simplify, `<insert text from pro-pose-al>`
 
+## Naming Semantics
+
+`<insert text from pro-pose-al>`
+
+## Example: Robot Arm with Gripper
+
+```xml
+<!-- Frames
+    * L - arm/link
+    * F - flange origin
+    * G - gripper physical origin.
+      To be coincident with either Ge (electrical offset) or Gp (pneumatic
+      offset).
+        * Gm - gripper model origin. Will not be coincident with G.
+-->
+
+<!-- arm.sdf -->
+<model name="arm">
+    <link name="link"/>
+    <frame name="flange_fixture">
+      <pose frame="link">{X_LF}</pose>
+    </frame>
+</model>
+
+<!-- flange_electric.sdf -->
+<model name="flange">
+    <link name="body"/>
+    <frame name="gripper_origin">
+      <pose frame="body">{X_FGe}</pose>
+    </frame>
+</model>
+
+<!-- flange_pneumatic.sdf -->
+<model name="flange">
+    <link name="body"/>
+    <frame name="gripper_origin">
+      <pose frame="body">{X_FGp}</pose>
+    </frame>
+</model>
+
+<!-- gripper.sdf -->
+<model name="gripper">
+    <link name="gripper"/>
+    <frame name="origin">
+        <pose>{X_GmG}</pose>
+    </frame>
+</model>
+```
+
+Proposed welding semantics, with somma dat nesting:
+```xml
+<model name="super_armio_bros">
+<!-- N.B. This could also be defined as a //world element. -->
+
+    <!-- Arm + Electric Flange + Gripper -->
+    <model name="robot_1">
+        <include file="arm.sdf">
+            <name>amr</name>
+            <pose>{X_MR1}</pose>
+        </include>
+        <include file="flange_electric">
+            <pose frame="arm/flange_origin"/>
+        </include>
+        <include file="gripper" canonical_frame="origin">
+            <pose frame="flange/gripper_origin"/>
+        </include>
+    </model>
+
+    <!-- Arm + Pneumatic Flange + Gripper
+         For fun, attached to end of above arm's gripper. -->
+    <model name="robot_2">
+        <include file="arm.sdf">
+            <name>arm</name>
+            <!-- N.B. B/c both models live in same file, cross referencing is
+            fine... ??? -->
+            <pose frame="robot_1/gripper">{X_G1R2}</pose>
+        </include>
+        <include file="flange_electric">
+            <pose frame="arm/flange_fixture"/>
+        </include>
+        <include file="gripper" canonical_frame="">
+            <pose frame="flange/gripper_fixture"/>
+        </include>
+    </model>
+
+    <joint name="cute_weld">
+        <parent>robot_1/gripper</parent>
+        <child>robot_2/link</child>  <!-- Or canonical frame? -->
+        <!-- <child>robot_2</child> - Alternative? -->
+    </joint>
+
+</model>
+```

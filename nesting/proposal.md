@@ -1,5 +1,8 @@
 # WIP Model Nesting: Proposal
 
+TODO(eric): Ensure that we have overarching goals for compatiblity but new
+functionality, with possible changes...
+
 At present, SDFormat adds an `<include/>` tag. However, it has the following
 design issues:
 
@@ -40,8 +43,6 @@ In order to simplify, `<insert text from pro-pose-al>`
     * L - arm/link
     * F - flange origin
     * G - gripper physical origin.
-      To be coincident with either Ge (electrical offset) or Gp (pneumatic
-      offset).
         * Gm - gripper model origin. Will not be coincident with G.
 -->
 
@@ -57,7 +58,7 @@ In order to simplify, `<insert text from pro-pose-al>`
 <model name="flange">
     <link name="body"/>
     <frame name="gripper_origin">
-      <pose frame="body">{X_FGe}</pose>
+      <pose frame="body">{X_FG_electric}</pose>
     </frame>
 </model>
 
@@ -65,7 +66,7 @@ In order to simplify, `<insert text from pro-pose-al>`
 <model name="flange">
     <link name="body"/>
     <frame name="gripper_origin">
-      <pose frame="body">{X_FGp}</pose>
+      <pose frame="body">{X_FG_pneumatic}</pose>
     </frame>
 </model>
 
@@ -92,7 +93,7 @@ Proposed welding semantics, with somma dat nesting:
         <include file="flange_electric">
             <pose frame="arm/flange_origin"/>
         </include>
-        <include file="gripper" canonical_frame="origin">
+        <include file="gripper" pose_model_frame="origin">
             <pose frame="flange/gripper_origin"/>
         </include>
     </model>
@@ -103,13 +104,15 @@ Proposed welding semantics, with somma dat nesting:
         <include file="arm.sdf">
             <name>arm</name>
             <!-- N.B. B/c both models live in same file, cross referencing is
-            fine... ??? -->
+                 fine... ??? -->
+            <!-- Should this be forced to use a relative path?
+                 e.g. ../robot_1/gripper? -->
             <pose frame="robot_1/gripper">{X_G1R2}</pose>
         </include>
         <include file="flange_electric">
             <pose frame="arm/flange_fixture"/>
         </include>
-        <include file="gripper" canonical_frame="">
+        <include file="gripper" pose_model_frame="origin">
             <pose frame="flange/gripper_fixture"/>
         </include>
     </model>
@@ -122,3 +125,9 @@ Proposed welding semantics, with somma dat nesting:
 
 </model>
 ```
+
+### Open Questions
+
+*   `<include/>` should or should not be able to override canonical frame?
+    * Care should be taken to enusre this does not alter the affixed-to
+    semantics of model-defined frames.

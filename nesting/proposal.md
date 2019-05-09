@@ -21,7 +21,7 @@ For this aspect, the goal of this proposal is meant to permit the following:
 * Adding models *after other models have been processed*
     * This is achievable with current implementation of Gazebo, and with
     partially-conformant implementation of Drake. However, with new proposals
-    for `//pose[@frame]` semantics, and the deisre to stick with model-aboslute
+    for `//pose[@frame]` semantics, and the desire to stick with model-absolute
     coordinates, this may become more nuanced when referring to frames in a
     model.
     * This permits SDFormat to be a *non-viral* format, e.g. a library developer
@@ -80,6 +80,7 @@ In order to simplify, `<insert text from pro-pose-al>`
 ```
 
 Proposed welding semantics, with somma dat nesting:
+
 ```xml
 <model name="super_armio_bros">
 <!-- N.B. This could also be defined as a //world element. -->
@@ -87,7 +88,7 @@ Proposed welding semantics, with somma dat nesting:
     <!-- Arm + Electric Flange + Gripper -->
     <model name="robot_1">
         <include file="arm.sdf">
-            <name>amr</name>
+            <name>arm</name>
             <pose>{X_MR1}</pose>
         </include>
         <include file="flange_electric">

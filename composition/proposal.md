@@ -6,7 +6,7 @@ Steven Peters `<scpeters@osrfoundation.org>`,
 Addisu Taddese  `<addisu@openrobotics.org>`
 * **Status**: Draft
 * **SDFormat Version**: 1.8
-* **`libsdformat` Version**: 10.0
+* **`libsdformat` Version**: 11.0
 
 ## Introduction
 
@@ -648,7 +648,7 @@ Files:
 ~~~xml
 <!-- arm.sdf -->
 <model name="arm">
-  <link name="link"/>
+  <link name="link"><!-- Insert realistic mass and inertia! --></link>
   <frame name="flange_mount">
     <pose relative_to="link">{X_ADa}</pose>
   </frame>
@@ -658,7 +658,7 @@ Files:
 ~~~xml
 <!-- flange_electric.sdf -->
 <model name="flange_electric">
-  <link name="body"/>
+  <link name="body"><!-- Insert realistic small mass and inertia! --></link>
 
   <frame name="mount">
     <pose relative_to="body">{X_FDf}</pose>
@@ -673,7 +673,7 @@ Files:
 ~~~xml
 <!-- flange_pneumatic.sdf -->
 <model name="flange_pneumatic">
-  <link name="body"/>
+  <link name="body"><!-- Insert realistic small mass and inertia! --></link>
 
   <frame name="mount">
     <pose relative_to="body">{X_FDf}</pose>
@@ -688,7 +688,7 @@ Files:
 ~~~xml
 <!-- gripper.sdf -->
 <model name="gripper">
-  <link name="gripper"/>
+  <link name="gripper"><!-- Insert realistic mass and inertia! --></link>
 
   <frame name="mount">
     <pose>{X_GCg}</pose>
